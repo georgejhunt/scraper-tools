@@ -1,0 +1,31 @@
+#!/bin/bash -x
+# unamespace the output of zimdump
+
+if [ ! -d "I" ]; then
+   echo We must be in the root directory of a zimdump. Quitting . . .
+   exit 1
+fi
+
+root=$(pwd)
+# put all of the images back in their original places
+cd I
+mv * ..
+cd $root
+if [ -d I ];then
+   rmdir I
+fi
+
+# Clip off the A namespace for html
+cd A
+cp -rp * ..
+
+ch $root
+if [ -d A ];then
+   rm -rf A
+fi
+
+for f in $(find .|grep html); do
+   sed -i -e's|../../I/|../|' $f
+   sed -i -e's|../I/|./|' $f
+done
+
